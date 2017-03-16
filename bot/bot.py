@@ -61,6 +61,10 @@ from ciscosparkapi import CiscoSparkAPI
 import os
 import sys
 import json
+from ccw.ccwparser import *
+from ccw.ccwquery import *
+
+
 
 # Create the Flask application that provides the bot foundation
 app = Flask(__name__)
@@ -71,6 +75,7 @@ app = Flask(__name__)
 # The value is the help message sent for the command
 commands = {
     "/echo": "Reply back with the same message sent.",
+    "/showconfig": "Shows current configuration.",
     "/help": "Get help."
 }
 
@@ -216,6 +221,8 @@ def process_incoming_message(post_data):
     # If no command found, send help
     if command in ["", "/help"]:
         reply = send_help(post_data)
+    elif command in ["/sendconfig"]:
+        reply = send_config(post_data)
     elif command in ["/echo"]:
         reply = send_echo(message)
 
@@ -237,6 +244,17 @@ def send_help(post_data):
     for c in commands.items():
         message = message + "* **%s**: %s \n" % (c[0], c[1])
     return message
+
+# Send Configuration.
+def send_config(post_data):
+    message = "Hello!  "
+    message = message + "Current Configuration is:  \n"
+    message = message + "API Client ID: "+os.environ.get("CLIENT_ID") + "\n"
+    message = message + "API Client Secret: "+os.environ.get("CLIENT_SECRET") + "\n"
+    message = message + "CEC Username: "+os.environ.get("CEC_USERID") + "\n"
+
+    return message
+
 
 
 # Return contents following a given command
@@ -269,6 +287,12 @@ if __name__ == '__main__':
     spark_token = os.getenv("SPARK_BOT_TOKEN")
     bot_url = os.getenv("SPARK_BOT_URL")
     bot_app_name = os.getenv("SPARK_BOT_APP_NAME")
+
+    client_id = os.getenv("CLIENT_ID")
+    client_secret = os.getenv("CLIENT_SECRET")
+    cec_username = os.getenv("CEC_USERID")
+    cec_password = os.getenv("CEC_PASSWORD")
+
 
     # bot_url and bot_app_name must come in from Environment Variables
     if bot_url is None or bot_app_name is None:
